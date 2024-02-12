@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import Chart from 'chart.js/auto';
 import { DataserviceService } from '../dataservice.service';
 
 @Component({
@@ -20,6 +21,7 @@ export class HeroComponent implements OnInit {
     this.dataService.getData().subscribe((data: any[]) => {
       if (data && data.length > 0) {
         this.createD3PieChart(data);
+        this.createChartJSLineChart(data);
       } else {
         console.error("No data available to create pie chart.");
       }
@@ -27,18 +29,18 @@ export class HeroComponent implements OnInit {
   }
 
   createD3PieChart(data: any[]) {
-    // Set up the data for the pie chart
+   
     const pieData = data.map(d => ({
       category: d.category,
       amount: parseFloat(d.amount)
     }));
 
-    // Define the dimensions of the pie chart
+    
     const width = 500;
     const height = 400;
     const radius = Math.min(width, height) / 2;
 
-    // Create an SVG element
+    
     const svg = d3.select("#d3PieChart")
       .append("svg")
       .attr("width", width)
@@ -46,20 +48,20 @@ export class HeroComponent implements OnInit {
       .append("g")
       .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    // Create the pie generator
+    
     const pie = d3.pie<any>().value(d => d.amount);
 
-    // Create the arc generator
+    
     const arc = d3.arc<any>().outerRadius(radius * 0.8).innerRadius(radius * 0.4);
 
-    // Generate the pie chart slices
+    
     const arcs = svg.selectAll("arc")
       .data(pie(pieData))
       .enter()
       .append("g")
       .attr("class", "arc");
 
-    // Add the pie slices
+    
     arcs.append("path")
       .attr("d", d => arc(d)!)
       .attr("fill", (d, i) => d3.schemeCategory10[i])
@@ -77,13 +79,70 @@ export class HeroComponent implements OnInit {
           .attr("d", arc);
       });
 
-    // Add text labels without polylines
+    
     arcs.append("text")
       .attr("transform", d => `translate(${arc.centroid(d)})`)
       .attr("dy", ".35em")
       .style("text-anchor", "middle")
       .text(d => d.data.category)
-      .attr("fill", "white"); // Set text color to white to make it more visible
+      .attr("fill", "white"); 
   }
 
+  createChartJSLineChart(data: any[]): void {
+    
+    const canvas = document.getElementById("chartjsLineChart") as HTMLCanvasElement;
+  
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error("Failed to get the 2D rendering context for the canvas.");
+      return;
+    }
+  
+   
+    canvas.width = 500; 
+    canvas.height = 400; 
+  
+    
+    const labels = data.map(d => d.category);
+    const amounts = data.map(d => d.amount);
+  
+    const chartData = {
+      labels: labels,
+      datasets: [{
+        label: 'Amount ($)',
+        data: amounts,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        fill: false
+      }]
+    };
+  
+    
+    new Chart(ctx, {
+      type: 'line',
+      data: chartData,
+      options: {
+        
+        responsive: false, 
+        maintainAspectRatio: false, 
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Category'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Amount ($)'
+            }
+          }
+        }
+      }
+    });
+  }
+  
 }
