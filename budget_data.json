@@ -1,0 +1,33 @@
+{
+    "expenses": [
+      {
+        "category": "Groceries",
+        "amount": 300
+      },
+      {
+        "category": "Rent",
+        "amount": 1200
+      },
+      {
+        "category": "Utilities",
+        "amount": 200
+      },
+      {
+        "category": "Dining Out",
+        "amount": 150
+      },
+      {
+        "category": "Entertainment",
+        "amount": 100
+      },
+      {
+        "category": "Transportation",
+        "amount": 250
+      },
+      {
+        "category": "Shopping",
+        "amount": 350
+      }
+    ]
+  }
+  

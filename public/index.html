@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Managing financial budget effectively can be tough and this free budget management app helps you track your expenses and stay on budget.">
+    <meta name="keywords" content="expenses, financial planning, money management,personal budget, budget management">
+    <meta name="author" content="Sahithi Garige">
+    <title>Personal Budget</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <a href="#main" class="skip">Skip to content</a>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/login.html">Login</a></li>
+            <li><a href="https://google.com">Google</a></li>
+        </ul>
+    </nav>
+    <div class="hero">
+        <h1>Personal Budget</h1>
+        <h2>A personal-budget management app</h2>
+    </div>
+    <main class="center" id="main">
+        <div class="page-area">
+
+            <article>
+                <h1>Stay on track</h1>
+                <p>
+                    Do you know where you are spending your money? If you really stop to track it down,
+                    you would get surprised! Proper budget management depends on real data... and this
+                    app will help you with that!
+                </p>
+            </article>
+
+            <article>
+                <h1>Alerts</h1>
+                <p>
+                    What if your clothing budget ended? You will get an alert. The goal is to never go over the budget.
+                </p>
+            </article>
+
+            <article>
+                <h1>Results</h1>
+                <p>
+                    People who stick to a financial plan, budgeting every expense, get out of debt faster!
+                    Also, they to live happier lives... since they expend without guilt or fear...
+                    because they know it is all good and accounted for.
+                </p>
+            </article>
+
+            <article>
+                <h1>Free</h1>
+                <p>
+                    This app is free!!! And you are the only one holding your data!
+                </p>
+            </article>
+
+            <article>
+                <h1>Stay on track</h1>
+                <p>
+                    Do you know where you are spending your money? If you really stop to track it down,
+                    you would get surprised! Proper budget management depends on real data... and this
+                    app will help you with that!
+                </p>
+            </article>
+
+            <article>
+                <h1>Alerts</h1>
+                <p>
+                    What if your clothing budget ended? You will get an alert. The goal is to never go over the budget.
+                </p>
+            </article>
+
+            <article>
+                <h1>Results</h1>
+                <p>
+                    People who stick to a financial plan, budgeting every expense, get out of debt faster!
+                    Also, they to live happier lives... since they expend without guilt or fear...
+                    because they know it is all good and accounted for.
+                </p>
+            </article>
+            <article>
+                <h1>Expenses Bar Chart</h1>
+                <canvas id="chartJSChart"></canvas>
+            </article>
+            <article>
+                <h1>Expenses Pie Chart</h1>
+                <div id="d3PieChart"></div> <!-- Keep the D3.js Pie Chart container -->
+            </article>
+            <article>
+                <h1>Expenses Line Chart</h1>
+                <canvas id="lineChart" width="400" height="400"></canvas>
+            </article>
+        </div>
+    </main>
+    <footer class="bottom">
+        <div class="center">
+            All rights reserved &copy; Fabio Nolasco
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"
+        integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+        integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v5.min.js" crossorigin="anonymous"></script>
+    <script>
+        // Function to create a Chart.js bar chart
+        function createChartJSBarChart(data) {
+            // Get the canvas element
+            const canvas = document.getElementById("chartJSChart");
+
+            // Define data for the chart
+            const labels = data.map(d => d.category);
+            const amounts = data.map(d => d.amount);
+            const backgroundColors = data.map((d, index) => `rgba(${index * 40},${index * 60},${index * 20},0.7)`);
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Amount ($)',
+                    data: amounts,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors,
+                    borderWidth: 1
+                }]
+            };
+
+            // Create the chart using Chart.js
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Category'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to create a D3.js pie chart
+        function createD3PieChart(data) {
+            // Set up the data for the pie chart
+            const pieData = data.map(d => ({
+                category: d.category,
+                amount: parseFloat(d.amount)
+            }));
+
+            // Define the dimensions of the pie chart
+            const width = 400;
+            const height = 400;
+            const radius = Math.min(width, height) / 2;
+
+            // Create an SVG element
+            const svg = d3.select("#d3PieChart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", `translate(${width / 2},${height / 2})`);
+
+            // Create the pie generator
+            const pie = d3.pie()
+                .sort(null)
+                .value(d => d.amount);
+
+            // Create the arc generator
+            const arc = d3.arc()
+                .outerRadius(radius * 0.8)
+                .innerRadius(radius * 0.4);
+
+            // Generate the pie chart slices
+            const arcs = svg.selectAll("arc")
+                .data(pie(pieData))
+                .enter()
+                .append("g")
+                .attr("class", "arc");
+
+            // Add the pie slices
+            arcs.append("path")
+                .attr("d", arc)
+                .attr("fill", (d, i) => d3.schemeCategory10[i])
+                .on("mouseover", function (d) {
+                    d3.select(this).transition()
+                        .duration(200)
+                        .attr("d", d3.arc()
+                            .innerRadius(radius * 0.4)
+                            .outerRadius(radius * 0.9)
+                        );
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this).transition()
+                        .duration(200)
+                        .attr("d", arc);
+                });
+
+            // Add text labels without polylines
+            arcs.append("text")
+                .attr("transform", function (d) {
+                    const pos = arc.centroid(d);
+                    return `translate(${pos})`;
+                })
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle")
+                .text(function (d) { return d.data.category; })
+                .attr("fill", "white"); // Set text color to white to make it more visible
+        }
+
+
+        // Function to create a Chart.js line chart
+        function createChartJSLineChart(data) {
+            // Get the canvas element
+            const canvas = document.getElementById("lineChart");
+
+            // Define data for the chart
+            const labels = data.map(d => d.category);
+            const amounts = data.map(d => d.amount);
+
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Amount ($)',
+                    data: amounts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            };
+
+            // Create the chart using Chart.js
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Category'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+        // Fetch the data from the server
+        axios.get("/budget")
+            .then(response => {
+                const data = response.data.expenses.expenses;
+                createChartJSBarChart(data);
+                createD3PieChart(data); // Call the function for D3.js Pie Chart
+                createChartJSLineChart(data);
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+    </script>
+</body>
+
+</html>
